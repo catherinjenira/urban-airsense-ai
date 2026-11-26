@@ -1,5 +1,5 @@
 import { LogOut, Menu, User, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ThemeMode } from '../hooks/useTheme';
 import { CityAlert, CityId, PageId, UserProfile } from '../types';
 import { CitySelector } from './CitySelector';
@@ -42,6 +42,15 @@ export function Navbar({
   onLogout,
 }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [mobileMenuOpen]);
 
   const handleNavClick = (page: PageId) => {
     onNavigate(page);
@@ -123,7 +132,7 @@ export function Navbar({
               onClick={onLogout}
               title="Log out"
               aria-label="Log out"
-              className="inline-flex h-8 items-center gap-1 rounded-md border border-[var(--border-hairline)] bg-[var(--bg-surface)] px-2.5 text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors"
+              className="inline-flex h-8 items-center gap-1 rounded-md border border-[var(--border-hairline)] bg-[var(--bg-surface)] px-2.5 text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245C45]"
             >
               <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
               <span>Log out</span>
@@ -134,6 +143,7 @@ export function Navbar({
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
             aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-nav-drawer"
             aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] md:hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245C45]"
           >
@@ -148,11 +158,14 @@ export function Navbar({
 
       {/* Mobile Navigation Drawer */}
       {mobileMenuOpen && (
-        <div className="border-t border-[var(--border-hairline)] bg-[var(--bg-surface)] px-4 py-4 md:hidden">
+        <div
+          id="mobile-nav-drawer"
+          className="border-t border-[var(--border-hairline)] bg-[var(--bg-surface)] px-4 py-4 md:hidden"
+        >
           <div className="mb-3 sm:hidden">
-            <label className="mb-1.5 block text-xs font-medium text-[var(--text-muted)]">
+            <span className="mb-1.5 block text-xs font-medium text-[var(--text-muted)]">
               Active City
-            </label>
+            </span>
             <CitySelector
               selectedCity={selectedCity}
               onSelectCity={onSelectCity}
@@ -165,8 +178,9 @@ export function Navbar({
                 <button
                   key={item.id}
                   type="button"
+                  aria-current={isActive ? 'page' : undefined}
                   onClick={() => handleNavClick(item.id)}
-                  className={`flex items-center justify-between rounded-md px-3 py-2.5 text-sm font-medium text-left transition-colors ${
+                  className={`flex items-center justify-between rounded-md px-3 py-2.5 text-sm font-medium text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245C45] ${
                     isActive
                       ? 'bg-[#245C45] text-white'
                       : 'text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]'

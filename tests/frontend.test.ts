@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { CITIES, CITY_MAP } from '../src/data/cities.ts';
+import { INITIAL_EXPOSURE_ENTRIES, POLLUTION_HOTSPOTS } from '../src/data/hotspots.ts';
 import {
   apiRequest,
   loginUser,
@@ -115,5 +116,22 @@ test('API client uses credentials include and parses errors safely', async () =>
     assert.equal(health.ok, true);
   } finally {
     globalThis.fetch = originalFetch;
+  }
+});
+
+test('POLLUTION_HOTSPOTS and INITIAL_EXPOSURE_ENTRIES are valid across all cities', () => {
+  assert.ok(POLLUTION_HOTSPOTS.length >= CITIES.length);
+  for (const city of CITIES) {
+    const citySpots = POLLUTION_HOTSPOTS.filter((h) => h.cityId === city.id);
+    assert.ok(citySpots.length >= 1, `Missing hotspots for ${city.id}`);
+    for (const spot of citySpots) {
+      assert.ok(spot.severityScore >= 0 && spot.severityScore <= 100);
+      assert.ok(spot.monthlyEpisodes.length >= 1);
+    }
+  }
+  assert.ok(INITIAL_EXPOSURE_ENTRIES.length >= 1);
+  for (const entry of INITIAL_EXPOSURE_ENTRIES) {
+    assert.ok(entry.durationMinutes >= 5);
+    assert.ok(entry.inhaledDoseUg > 0);
   }
 });

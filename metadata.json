@@ -1,6 +1,5 @@
 {
   "name": "Urban AirSense AI",
-  "description": "Intelligent multi-city urban air quality monitoring and environmental intelligence platform for Indian cities.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "description": "SQL-backed urban air quality monitoring, spatial exploration, Random Forest AQI forecasting, and personal exposure analytics for Indian cities.",
+  "requestFramePermissions": []
 }

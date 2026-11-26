@@ -25,6 +25,7 @@ from backend.init_db import get_aqi_category, ingest_dataset
 TREES_PATH = Path(__file__).resolve().parent / "models" / "rf_inference_trees.json.gz"
 
 VALID_CITY_IDS = {"chennai", "bengaluru", "hyderabad", "delhi", "mumbai", "coimbatore"}
+VALID_ACTIVITIES = {"Walking", "Jogging", "Cycling", "Commuting"}
 EMAIL_REGEX = re.compile(r"^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$")
 PASSWORD_LETTER_RE = re.compile(r"[A-Za-z]")
 PASSWORD_DIGIT_RE = re.compile(r"[0-9]")
@@ -910,6 +911,12 @@ def create_exposure_log(
     payload: ExposureCreateRequest, user: dict = Depends(get_current_user)
 ):
     """Persist a personal exposure entry for the authenticated user."""
+    city_id = payload.cityId.strip().lower()
+    if city_id not in VALID_CITY_IDS:
+        raise HTTPException(status_code=400, detail="Invalid cityId for exposure entry.")
+    if payload.activity not in VALID_ACTIVITIES:
+        raise HTTPException(status_code=400, detail="Invalid activity type.")
+
     with get_connection(include_db=True) as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -922,7 +929,7 @@ def create_exposure_log(
                 (
                     user["id"],
                     payload.entryDate,
-                    payload.cityId,
+                    city_id,
                     payload.activity,
                     payload.durationMinutes,
                     payload.estimatedPm25,
@@ -934,7 +941,7 @@ def create_exposure_log(
         "entry": {
             "id": str(entry_id),
             "date": payload.entryDate,
-            "cityId": payload.cityId,
+            "cityId": city_id,
             "activity": payload.activity,
             "durationMinutes": payload.durationMinutes,
             "estimatedPm25": payload.estimatedPm25,

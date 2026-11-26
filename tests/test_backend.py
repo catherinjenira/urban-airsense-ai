@@ -344,6 +344,68 @@ def test_exposure_crud_and_user_isolation(client: TestClient):
         client.get("/api/exposure", headers={"Authorization": f"Bearer {token_a}"}).json()["entries"]
     ) == 0
 
+    bad_city = client.post(
+        "/api/exposure",
+        headers={**CSRF_HEADERS, "Authorization": f"Bearer {token_a}"},
+        json={
+            "entryDate": "Today · 10:00",
+            "cityId": "unknown-city",
+            "activity": "Walking",
+            "durationMinutes": 20,
+            "estimatedPm25": 30.0,
+            "inhaledDoseUg": 10.0,
+        },
+    )
+    assert bad_city.status_code == 400
+
+    bad_activity = client.post(
+        "/api/exposure",
+        headers={**CSRF_HEADERS, "Authorization": f"Bearer {token_a}"},
+        json={
+            "entryDate": "Today · 10:00",
+            "cityId": "chennai",
+            "activity": "Skydiving",
+            "durationMinutes": 20,
+            "estimatedPm25": 30.0,
+            "inhaledDoseUg": 10.0,
+        },
+    )
+    assert bad_activity.status_code == 400
+
+
+def test_helper_edge_cases_and_db_config(monkeypatch: pytest.MonkeyPatch):
+    from backend.db import get_db_config, is_sqlite_mode, reset_db_mode_cache
+    from backend.init_db import _parse_optional_float
+    from backend.main import _get_allowed_origins, _percentile, _verify_password
+
+    assert _parse_optional_float(None) is None
+    assert _parse_optional_float("NA") is None
+    assert _parse_optional_float("not-a-number") is None
+    assert _parse_optional_float(" 42.5 ") == 42.5
+
+    assert _percentile([], 50.0) == 0.0
+    assert _percentile([12.0], 50.0) == 12.0
+    assert _percentile([10.0, 20.0, 30.0], 50.0) == 20.0
+    assert _verify_password("pw", "malformed-hash") is False
+
+    monkeypatch.setenv("ALLOWED_ORIGINS", "https://example.com, https://app.example.com")
+    assert _get_allowed_origins() == ["https://example.com", "https://app.example.com"]
+
+    monkeypatch.setenv("DB_SSL", "true")
+    monkeypatch.setenv("DB_NAME", "urban_airsense_db")
+    cfg = get_db_config(include_db=True)
+    assert "ssl" in cfg and cfg["database"] == "urban_airsense_db"
+
+    monkeypatch.delenv("DB_TYPE", raising=False)
+    monkeypatch.setenv("VERCEL", "1")
+    monkeypatch.setenv("DB_HOST", "127.0.0.1")
+    reset_db_mode_cache()
+    assert is_sqlite_mode() is True
+    monkeypatch.setenv("DB_TYPE", "mysql")
+    reset_db_mode_cache()
+    assert is_sqlite_mode() is False
+    reset_db_mode_cache()
+
 
 def test_tree_inference_and_optional_sklearn_parity():
     from backend.main import _get_trees, _predict_classifier_trees, _predict_regressor_trees

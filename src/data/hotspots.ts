@@ -1,4 +1,4 @@
-import { ExposureEntry, PollutionHotspot } from '../types';
+import type { ExposureEntry, PollutionHotspot } from '../types';
 
 export const INITIAL_EXPOSURE_ENTRIES: ExposureEntry[] = [
   {
