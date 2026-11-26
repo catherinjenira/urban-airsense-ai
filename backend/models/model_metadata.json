@@ -1,0 +1,122 @@
+{
+  "modelVersion": "RF-CPCB-v1.0",
+  "algorithm": "Random Forest (250 trees)",
+  "trainedAt": "2026-11-25T15:12:47.263008+00:00",
+  "dataset": {
+    "totalStations": 570,
+    "labeledStations": 547,
+    "citiesCount": 292,
+    "statesCount": 31,
+    "categoryDistribution": {
+      "Moderate": 227,
+      "Satisfactory": 172,
+      "Poor": 102,
+      "Good": 37,
+      "Very Poor": 9
+    }
+  },
+  "aqiMetrics": {
+    "r2": 0.9786,
+    "cvR2Mean": 0.984,
+    "mae": 4.73,
+    "rmse": 10.71,
+    "classifierAccuracy": 0.9455,
+    "testSamples": 110,
+    "trainSamples": 437
+  },
+  "pm25Metrics": {
+    "r2": 0.7535,
+    "mae": 27.06,
+    "rmse": 38.44,
+    "samples": 538
+  },
+  "aqiFeatureImportances": [
+    {
+      "feature": "pm25",
+      "label": "PM2.5",
+      "importance": 0.8328
+    },
+    {
+      "feature": "pm10",
+      "label": "PM10",
+      "importance": 0.1598
+    },
+    {
+      "feature": "ozone",
+      "label": "Ozone (O3)",
+      "importance": 0.0036
+    },
+    {
+      "feature": "no2",
+      "label": "NO2",
+      "importance": 0.0012
+    },
+    {
+      "feature": "co",
+      "label": "CO",
+      "importance": 0.001
+    },
+    {
+      "feature": "latitude",
+      "label": "Latitude",
+      "importance": 0.0009
+    },
+    {
+      "feature": "longitude",
+      "label": "Longitude",
+      "importance": 0.0004
+    },
+    {
+      "feature": "so2",
+      "label": "SO2",
+      "importance": 0.0003
+    },
+    {
+      "feature": "nh3",
+      "label": "NH3",
+      "importance": 0.0002
+    }
+  ],
+  "pm25FeatureImportances": [
+    {
+      "feature": "pm10",
+      "label": "PM10",
+      "importance": 0.7661
+    },
+    {
+      "feature": "latitude",
+      "label": "Latitude",
+      "importance": 0.072
+    },
+    {
+      "feature": "longitude",
+      "label": "Longitude",
+      "importance": 0.0541
+    },
+    {
+      "feature": "no2",
+      "label": "NO2",
+      "importance": 0.0281
+    },
+    {
+      "feature": "ozone",
+      "label": "Ozone (O3)",
+      "importance": 0.023
+    },
+    {
+      "feature": "co",
+      "label": "CO",
+      "importance": 0.0225
+    },
+    {
+      "feature": "so2",
+      "label": "SO2",
+      "importance": 0.0193
+    },
+    {
+      "feature": "nh3",
+      "label": "NH3",
+      "importance": 0.0148
+    }
+  ]
+}
